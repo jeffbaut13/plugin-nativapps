@@ -11,27 +11,6 @@ Author: Jefersson Bautista
 
 require_once dirname(__FILE__) . '/admin/lista_libros.php';
 
-
-function Activar(){
-        global $wpdb;
-
-        $sql ="CREATE TABLE IF NOT EXISTS {$wpdb->prefix}libros(
-            `ID` INT NOT NULL AUTO_INCREMENT,
-                `Nombre` VARCHAR(45) NULL,
-                `Genero` VARCHAR(45) NULL,
-                `Autor` VARCHAR(45) NULL,
-                `Fecha_publicacion` VARCHAR(45) NULL,
-                `Imagen` VARCHAR(150) NULL,
-                PRIMARY KEY (`ID`));";
-    
-             $wpdb->query($sql);     
-
-}
-
-function Desactivar(){
-    flush_rewrite_rules();
-}
-
 register_activation_hook(__FILE__,'Activar');
 register_deactivation_hook(__FILE__,'Desactivar');
 add_action('admin_menu','CrearMenu');
