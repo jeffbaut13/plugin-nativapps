@@ -2,7 +2,7 @@
 /*
 Plugin Name: Libreria Online
 Plugin URI: 
-Description: Plugin para incluir una libreria en cualquier parte de tu sitioweb por medio de shortcode
+Description: Plugin para incluir una libreria por medio de Custom Post Type
 Version: 0.0.1
 Author: Jefersson Bautista
 */
