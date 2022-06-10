@@ -16,10 +16,10 @@
     echo "<p>". get_bloginfo('name') . "</p>";
 ?>
     <div>
-        <h2>Url de Instalación</h2>
+        <h2>Url Instalación</h2>
     </div>
 <?php
-    echo '<a href="'.get_home_url() . "/wp-admin/setup-config.php".'">URL de Instalación</a>';
+    echo $plugin_dir_path = dirname(__FILE__);   
 ?>
     <div>
         <h2>Versión de Wordpress</h2>
@@ -32,7 +32,7 @@
         <h2>URL Wordpress</h2>
     </div>
 <?php
-    echo '<a href="https://wordpress.com/es/">WORDPRESS<a>';
+    echo plugin_dir_url( __FILE__ );
 ?>
     <div>
         <h2>Themes Instalados</h2>

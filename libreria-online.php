@@ -8,7 +8,8 @@ Author: Jefersson Bautista
 */
 
 //requires
-require_once dirname(__FILE__) . '/includes/init.php';
+
+require_once dirname(__FILE__) . '/admin/CPT_libros.php';
 
 
 function Activar(){
@@ -46,14 +47,6 @@ function CrearMenu(){
     );
     
     add_submenu_page(
-        'libreria', //adicion submenu slug padre
-        'Libro', 
-        'Libro',
-        'manage_options',
-        'sp_libros',
-        'MostrarContenido'
-    );
-    add_submenu_page(
         'libreria',//adicion submenu slug padre
         'Dashboard',
         'Dashboard',
@@ -73,11 +66,7 @@ function CrearMenu(){
     remove_submenu_page( 'libreria', 'libreria' ); //elimino del submenu el scantoolwp
 }
 
-function MostrarContenido(){
-    
-    include(plugin_dir_path(__FILE__).'admin/lista_libros.php');//archivo externo para mostrar contenido
-    
-}
+
 function About_menu(){
     include(plugin_dir_path(__FILE__).'admin/about.php');//archivo externo para mostrar contenido
 }
@@ -86,65 +75,9 @@ function Dashboard_menu(){
     include(plugin_dir_path(__FILE__).'admin/dashboard.php');//archivo externo para mostrar contenido
 }
 
-//encolar bootstrap
-
-function EncolarBootstrapJS($hook){
-
-    if($hook != "scantoolwp_page_sp_libros"){
-        return ;
-    }
-    wp_enqueue_script('bootstrapJs',plugins_url('admin/bootstrap/js/bootstrap.min.js',__FILE__),array('jquery'));
-}
-add_action('admin_enqueue_scripts','EncolarBootstrapJS');
-
-
-function EncolarBootstrapCSS($hook){
-    if($hook != "scantoolwp_page_sp_libros"){
-        return ;
-    }
-    wp_enqueue_style('bootstrapCSS',plugins_url('admin/bootstrap/css/bootstrap.min.css',__FILE__));
-}
-add_action('admin_enqueue_scripts','EncolarBootstrapCSS');
-
-
-//encolar js propio
-
-function EncolarJS($hook){
-    if($hook != "scantoolwp_page_sp_libros"){
-        return ;
-    }
-    wp_enqueue_media();
-    wp_enqueue_script('JsExterno',plugins_url('admin/js/lista_libros.js',__FILE__),array('jquery'));
-    wp_localize_script('JsExterno','SolicitudesAjax',[
-        'url' => admin_url('admin-ajax.php'),
-        'seguridad' => wp_create_nonce('seg')
-    ]);
-}
-add_action('admin_enqueue_scripts','EncolarJS');
 
 function css_table(){
     wp_register_style('estilos-css', plugin_dir_url(__FILE__).'admin/css/estilos-props.css', false, '1.0.');
     wp_enqueue_style( 'estilos-css' );
 }
 add_action( 'wp_enqueue_scripts', 'css_table', 10 );
-
-
-//ajax
-
-function EliminarLibro(){
-    $nonce = $_POST['nonce'];
-    if(!wp_verify_nonce($nonce, 'seg')){
-        die('no tiene permisos para ejecutar ese ajax');
-    }
-
-    $id = $_POST['id'];
-    global $wpdb;
-    $tabla = "{$wpdb->prefix}libros";
-    $wpdb->delete($tabla,array('ID' =>$id));
-    
-     return true;
-}
-
-add_action('wp_ajax_peticioneliminar','EliminarLibro');
-
-

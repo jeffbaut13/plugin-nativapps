@@ -1,140 +1,220 @@
 <?php
-    global $wpdb;
+ //registrer CUSTOM POST TYPE
+
+add_action('init', 'libro_post_type');
+function libro_post_type() {
+    register_post_type('libro', array(
+        'labels' => array(
+            'name'                  => _x( 'Libros', 'Post Type General Name', 'libros_domain' ),
+            'singular_name'         => _x( 'libro', 'Post Type Singular Name', 'libros_domain' ),
+            'menu_name'             => __( 'Libros', 'libros_domain' ),
+            'name_admin_bar'        => __( 'Libros', 'libros_domain' ),
+            'archives'              => __( 'Archivo de Libros', 'libros_domain' ),
+            'attributes'            => __( 'Atributos de Libro', 'libros_domain' ),
+            'parent_item_colon'     => __( 'Libro Padre', 'libros_domain' ),
+            'all_items'             => __( 'Todos los Libros', 'libros_domain' ),
+            'add_new_item'          => __( 'Agregar nuevo Libro', 'libros_domain' ),
+            'add_new'               => __( 'Añadir Nuevo', 'libros_domain' ),
+            'new_item'              => __( 'Nuevo Libro', 'libros_domain' ),
+            'edit_item'             => __( 'Editar Libro', 'libros_domain' ),
+            'update_item'           => __( 'Actualizar Libro', 'libros_domain' ),
+            'view_item'             => __( 'Ver Libro', 'libros_domain' ),
+            'view_items'            => __( 'Ver Libros', 'libros_domain' ),
+            'search_items'          => __( 'Buscar Libros', 'libros_domain' ),
+            'not_found'             => __( 'No encontrado', 'libros_domain' ),
+            'not_found_in_trash'    => __( 'No encontrado en la papelera', 'libros_domain' ),
+            'featured_image'        => __( 'Imagen destacada', 'libros_domain' ),
+            'set_featured_image'    => __( 'Establecer Imagen Destacada', 'libros_domain' ),
+            'remove_featured_image' => __( 'Eliminar la imagen destacada', 'libros_domain' ),
+            'use_featured_image'    => __( 'Utilizar como imagen destacada', 'libros_domain' ),
+            'insert_into_item'      => __( 'Insertar en el Libro', 'libros_domain' ),
+            'uploaded_to_this_item' => __( 'Actualizar en este Libro', 'libros_domain' ),
+            'items_list'            => __( 'lista de Libros', 'libros_domain' ),
+            'items_list_navigation' => __( 'lista mavegable de Libros', 'libros_domain' ),
+            'filter_items_list'     => __( 'Filtro de Lista de Libros', 'libros_domain' ),
+        ),
+       
+        'label'                 => __( 'Libros', 'libros_domain' ),
+		'description'           => __( 'Listado de Libros', 'libros_domain' ),
+		'labels'                => $labels,
+		'supports'              => array('title', 'thumbnail', 'revisions', 'revisions'),
+		'hierarchical'          => false,
+		'public'                => true,
+		'show_ui'               => true,
+		'show_in_menu'          => true,
+		'menu_position'         => 5,
+		'menu_icon'             => 'dashicons-book',
+		'show_in_admin_bar'     => true,
+		'show_in_nav_menus'     => true,
+		'can_export'            => true,
+		'has_archive'           => true,
+		'exclude_from_search'   => false,
+		'publicly_queryable'    => true,
+		'rewrite'               => $rewrite,
+		'capability_type'       => 'page',
+		'show_in_rest'          => true,
+    ));
+}
+// registro de campos personalizados
+add_action( 'init', 'cyb_register_meta_fields' );
+function cyb_register_meta_fields() {
+  register_meta( 'libro',
+               'cyb_autor',
+               [
+                 'description'      => _x( 'Autor', 'meta description', 'cyb-textdomain' ),
+                 'single'           => true,
+                 'sanitize_callback' => 'sanitize_text_field',
+                 'auth_callback'     => 'aut_call'
+               ]
+  );
+
+  register_meta( 'libro',
+               'cyb_genero',
+               [
+                 'description'      => _x( 'Genero', 'meta description', 'cyb-textdomain' ),
+                 'single'           => true,
+                 'sanitize_callback' => 'sanitize_text_field',
+                 'auth_callback'     => 'aut_call'
+               ]
+  );
+
+  register_meta( 'libro',
+               'cyb_fecha',
+               [
+                 'description'      => _x( 'Fecha Publicación', 'meta description', 'cyb-textdomain' ),
+                 'single'           => true,
+                 'sanitize_callback' => 'sanitize_text_field',
+                 'auth_callback'     => 'aut_call'
+               ]
+  );
+  
+}
 
 
-  $tabla = "{$wpdb->prefix}libros";
-
-    if(isset($_POST['btnguardar'])){
-      
-      $imagen = $_POST['txtimage'];
-      $nombre = $_POST['txtnombre'];
-      $Genero = $_POST['txtgenero'];
-      $autor = $_POST['txtautor'];
-      $Fecha_publicacion = $_POST['txtfecha'];
-
-      $datos = [
-        'Imagen' => $imagen,
-        'Nombre' => $nombre,
-        'Genero' => $Genero,
-        'Autor' => $autor,
-        'Fecha_publicacion' => $Fecha_publicacion,
-    ];
-    $respuesta =  $wpdb->insert($tabla,$datos);
-    }
-
-    $query = "SELECT * FROM $tabla";
-    $lista_libros = $wpdb->get_results($query,ARRAY_A);
-    if(empty($lista_libros)){
-      $lista_libros = array();
+//funcion de callback
+function aut_call( $allowed, $meta_key, $libro_id, $user_id, $cap, $caps ) {
+  
+  if( 'libro' == get_post_type( $post_id ) && current_user_can( 'edit_post', $post_id ) ) {
+    $allowed = true;
+  } else {
+    $allowed = false;
   }
 
+  return $allowed;
 
-?>
-<div class="wrap">
-  
-        <?php
-             echo "<h1 class='wp-heading-inline'>" . get_admin_page_title() . "</h1>";
-        ?>
-        <a id="btnnuevo" class="page-title-action">Ingresar Libro</a>
+}
+//añadir campos  
+add_action( 'add_meta_boxes', 'cyb_meta_boxes' );
+function cyb_meta_boxes() {
+    add_meta_box( 'cyb-meta-box', __( 'Información General', 'cyb_textdomain' ), 'cyb_meta_box_callback', 'libro' );
+}
 
-         <br>
+function cyb_meta_box_callback( $post ) {
 
-         <div class="container">
-          <h3>Shortcode</h3>
-          <h4 class="font-weight-normal">Con el siguiente código Podrás implementar una sección de tipo Card con los libros que ingreses: <strong>[cards-libros]</strong></h4>
-          <h4 class="font-weight-normal">Si deseas una lista de los libros mas sencilla: <strong>[lista-libros]</strong></h4>
-        </div> 
+     wp_nonce_field( 'cyb_meta_box', 'cyb_meta_box_noncename' );
+     ?>
+     <p>
+         <label class="label" for="cyb_autor"><?php _e( 'Autor', 'cyb_textdomain' ); ?></label>
+         <input  name="cyb_autor" id="cyb_autor" type="text" value="<?php echo esc_attr( get_post_meta( $post->ID, 'cyb_autor', true ) ); ?>">
+     </p>
 
-        <br>
-         <table class="wp-list-table widefat fixed striped pages">
-                <thead>
-                    <th >Imagen</th>    
-                    <th >Nombre del libro</th>
-                    <th >Genero</th>
-                    <th >Autor</th>
-                    <th >Fecha Publicación</th>
-                    <th >Eliminar</th>
-                    
-                </thead>
-                <tbody id="the-list">
-                    <?php 
-                        foreach ($lista_libros as $key => $value) {
-                          $id = $value['ID'];
-                         $nombre = $value['Nombre'];
-                         $genero = $value['Genero'];
-                         $autor = $value['Autor'];
-                         $fecha = $value['Fecha_publicacion'];
-                         $imagen = $value['Imagen'];
-                           echo '
-                                <tr>
-                                    <td> <img width="50px" src="'.$imagen.'"></td>         
-                                    <td>'.$nombre.'</td>
-                                    <td>'.$genero.'</td>
-                                    <td>'.$autor.'</td>
-                                    <td>'.$fecha.'</td>
-                                    <td><a data-id="'.$id.'" class="page-title-action">Borrar</a></td>
-                                </tr>
-                            ';
-                        }
+     <p>
+         <label class="label" for="cyb_genero"><?php _e( 'Genero', 'cyb_textdomain' ); ?></label>
+         <input  name="cyb_genero" id="cyb_genero" type="text" value="<?php echo esc_attr( get_post_meta( $post->ID, 'cyb_genero', true ) ); ?>">
+     </p>
 
-                    ?>
-                </tbody>
-        </table>
+     <p>
+         <label class="label" for="cyb_fecha"><?php _e( 'fecha de Publicación', 'cyb_textdomain' ); ?></label>
+         <input  name="cyb_fecha" id="cyb_fecha" type="text" value="<?php echo esc_attr( get_post_meta( $post->ID, 'cyb_fecha', true ) ); ?>">
+     </p>
+     <?php
+
+}
+//guardar datos base de datos
+add_action( 'save_post', 'cyb_save_custom_fields', 10, 2 );
+function cyb_save_custom_fields( $post_id, $post ) {
+    
+    
+    if ( ! isset( $_POST['cyb_meta_box_noncename'] ) || ! wp_verify_nonce( $_POST['cyb_meta_box_noncename'], 'cyb_meta_box' ) ) {
+        return;
+    }
+            
+    
+    if( isset( $_POST['cyb_autor'] ) && $_POST['cyb_autor'] != "" ) {
+        update_post_meta( $post_id, 'cyb_autor', $_POST['cyb_autor'] );
+    } else {
+    
+        delete_post_meta( $post_id, 'cyb_autor' );
+    }
+    
+    if( isset( $_POST['cyb_genero'] ) && $_POST['cyb_genero'] != "" ) {
+        update_post_meta( $post_id, 'cyb_genero', $_POST['cyb_genero'] );
+    } else {
+    
+        delete_post_meta( $post_id, 'cyb_genero' );
+    }
+
+    
+    if( isset( $_POST['cyb_fecha'] ) && $_POST['cyb_fecha'] != "" ) {
+        update_post_meta( $post_id, 'cyb_fecha', $_POST['cyb_fecha'] );
+    } else {
+        
+        delete_post_meta( $post_id, 'cyb_fecha' );
+    }
+}
+
+//crear columnas para el dashboard de libros
+function columnas_post_type_libro($columnas){
+    $columnas = array(
+        'cb' => '&lt;input type="checkbox" />',
+        'title' => 'Título',
+        'cyb_autor' => 'Autor',
+        'cyb_genero' => 'Genero',
+        'cyb_fecha' => 'Fecha de Publicación',   
+    );
+    return $columnas;
+}
+add_filter('manage_edit-libro_columns', 'columnas_post_type_libro') ;
+
+//insertar datos de nbase de datos
+function filas_post_type_libro($columna, $post_id){
+    global $post;
+    switch($columna){
+        case 'cyb_genero':
+            $data_genero = get_post_meta($post_id, 'cyb_genero');
+            foreach($data_genero as $g ){
+                echo $g;
+            }
+            
+            break;
+        case 'cyb_autor':
+            $data_autor = get_post_meta( $post_id, 'cyb_autor' );
+            foreach($data_autor as $a ){
+                echo $a;
+            }	  
+            break;
+        case 'cyb_fecha':
+            $data_fecha = get_post_meta( $post_id, 'cyb_fecha' );
+            foreach($data_fecha as $f ){
+                echo $f;
+            }	    
+
+        default :
+        break;
+    }
+    
+}
+add_action('manage_libro_posts_custom_column', 'filas_post_type_libro', 2, 10);
 
 
- </div>
+/* Assign custom template to event post type*/
+function load_event_template( $template ) {
+  global $post;
+  if ( 'libro' === $post->post_type && locate_template( array( 'single-event.php' ) ) !== $template ) {
+      return plugin_dir_path( __FILE__ ) . 'single-event.php';
+  }
 
- <!-- Modal -->
-<div class="modal fade" id="modalnuevo" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title" id="exampleModalLongTitle">Agregar Libro</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-          <form method="post">
+  return $template;
+}
 
-              <div class="modal-body" style="padding:0">
-                  
-                        <div class="form-group">
-                          <label for="txtnombre" class="col-sm-4 col-form-label" >Nombre del Libro</label>
-                          <div class="col-sm-8" style="margin-bottom:10px">
-                              <input type="text" id="txtnombre" name="txtnombre" style="width:100%">
-                          </div>
-                          <label for="txtgenero" class="col-sm-4 col-form-label" >Genero</label>
-                          <div class="col-sm-8" style="margin-bottom:10px">
-                              <input type="text" id="txtgenero" name="txtgenero" style="width:100%">
-                          </div>
-                          <label for="txtautor" class="col-sm-4 col-form-label" >Autor</label>
-                          <div class="col-sm-8" style="margin-bottom:10px">
-                              <input type="text" id="txtautor" name="txtautor" style="width:100%">
-                          </div>
-                          <label for="txtfecha" class="col-sm-4 col-form-label" >Fecha de Publicación</label>
-                          <div class="col-sm-8" style="margin-bottom:10px">
-                              <input type="text" id="txtfecha" name="txtfecha" style="width:100%">
-                          </div>
-                          <label for="txtimage" class="col-sm-4 col-form-label" >Adjuntar Imagen</label>
-                          <div class="col-sm-8" style="margin-bottom:10px">
-                              <input id="txtimage" type="text" name="txtimage" />
-                              <input id="upload-button" type="button" class="button" value="Upload Image" />
-                          </div>
-
-          
-                        </div>
-                        
-
-
-              </div>
-              <div class="modal-footer mt4">
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
-                <button type="submit" class="btn btn-primary" name="btnguardar" id="btnguardar">Guardar</button>
-              </div>
-         </form>
-
-    </div>
-  </div>
-</div>
-<?php
-
+add_filter( 'single_template', 'load_event_template' );
