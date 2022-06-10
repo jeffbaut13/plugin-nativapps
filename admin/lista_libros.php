@@ -211,7 +211,7 @@ add_action('manage_libro_posts_custom_column', 'filas_post_type_libro', 2, 10);
 function load_event_template( $template ) {
   global $post;
   if ( 'libro' === $post->post_type && locate_template( array( 'single-event.php' ) ) !== $template ) {
-      return plugin_dir_path( __FILE__ ) . 'single-event.php';
+      return plugin_dir_path( __FILE__ ) . 'CPT_libros.php';
   }
 
   return $template;

@@ -2,23 +2,33 @@
 /*
 Plugin Name: Libreria Online
 Plugin URI: 
-Description: Plugin para incluir una libreria por medio de Custom Post Type
+Description: Plugin custom Post Type de libros
 Version: 0.0.1
 Author: Jefersson Bautista
 */
 
 //requires
 
-require_once dirname(__FILE__) . '/admin/CPT_libros.php';
+require_once dirname(__FILE__) . '/admin/lista_libros.php';
 
-function Desactivar(){
-    flush_rewrite_rules();
+function Activar(){
+    global $wpdb;
+
+    $sql ="CREATE TABLE IF NOT EXISTS {$wpdb->prefix}libros(
+        `ID` INT NOT NULL AUTO_INCREMENT,
+            `Nombre` VARCHAR(45) NULL,
+            `Genero` VARCHAR(45) NULL,
+            `Autor` VARCHAR(45) NULL,
+            `Fecha_publicacion` VARCHAR(45) NULL,
+            `Imagen` VARCHAR(150) NULL,
+            PRIMARY KEY (`ID`));";
+
+         $wpdb->query($sql);     
+
 }
 
 register_activation_hook(__FILE__,'Activar');
 register_deactivation_hook(__FILE__,'Desactivar');
-register_uninstall_hook(__FILE__, 'borrar');
-
 add_action('admin_menu','CrearMenu');
 
 function CrearMenu(){
