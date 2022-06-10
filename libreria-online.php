@@ -47,8 +47,8 @@ function CrearMenu(){
     
     add_submenu_page(
         'libreria', //adicion submenu slug padre
-        'Libros', 
-        'Libros',
+        'Libro', 
+        'Libro',
         'manage_options',
         'sp_libros',
         'MostrarContenido'
