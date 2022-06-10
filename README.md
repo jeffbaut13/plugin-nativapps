@@ -5,3 +5,4 @@ Este plugin fue creado para agregar desde el dashboard de wordpress y mostrar en
 
 Card:
 ![image](https://user-images.githubusercontent.com/98704711/173000989-de619fdc-5a8b-4283-833a-972582f51347.png)
+
