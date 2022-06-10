@@ -17,6 +17,8 @@ function Desactivar(){
 
 register_activation_hook(__FILE__,'Activar');
 register_deactivation_hook(__FILE__,'Desactivar');
+register_uninstall_hook(__FILE__, 'borrar');
+
 add_action('admin_menu','CrearMenu');
 
 function CrearMenu(){
