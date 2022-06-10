@@ -11,9 +11,7 @@ Author: Jefersson Bautista
 
 require_once dirname(__FILE__) . '/admin/CPT_libros.php';
 
-function Desactivar(){
-    flush_rewrite_rules();
-}
+
 
 register_activation_hook(__FILE__,'Activar');
 register_deactivation_hook(__FILE__,'Desactivar');
